@@ -13,16 +13,21 @@ public struct Waveform: View {
     @State private var panGestureValue: CGFloat = 0
     @Binding var selectedSamples: SampleRange
     @Binding var selectionEnabled: Bool
+    @Binding var playMarker: SampleRange
+    @Binding var playing: Bool
+    @State var playingDoneAnimate: Bool = false
     
     /// Creates an instance powered by the supplied generator.
     /// - Parameters:
     ///   - generator: The object that will supply waveform data.
     ///   - selectedSamples: A binding to a `SampleRange` to update with the selection chosen in the waveform.
     ///   - selectionEnabled: A binding to enable/disable selection on the waveform
-    public init(generator: WaveformGenerator, selectedSamples: Binding<SampleRange>, selectionEnabled: Binding<Bool>) {
+    public init(generator: WaveformGenerator, selectedSamples: Binding<SampleRange>, selectionEnabled: Binding<Bool>, playMarker: Binding<SampleRange>, playing: Binding<Bool>) {
         self.generator = generator
         self._selectedSamples = selectedSamples
         self._selectionEnabled = selectionEnabled
+        self._playMarker = playMarker
+        self._playing = playing
     }
     
     public var body: some View {
@@ -34,6 +39,25 @@ public struct Waveform: View {
                 
                 Renderer(waveformData: generator.sampleData)
                     .preference(key: SizeKey.self, value: geometry.size)
+                
+                        Highlight(selectedSamples: playMarker)
+                            .foregroundColor(.accentColor)
+                            .opacity(playingDoneAnimate ? 1.0 : 0.0)
+                            .onChange(of: playing){value in
+                                    DispatchQueue.main.async {
+                                        if value{
+                                            withAnimation(.easeIn(duration: 0.1)){
+                                                playingDoneAnimate = true
+                                            }
+                                        }
+                                        else{
+                                            withAnimation(.easeOut(duration: 0.5)){
+                                                playingDoneAnimate = false
+                                            }
+                                        }
+                                }
+                                
+                            }
                 
                 if selectionEnabled {
                     Highlight(selectedSamples: selectedSamples)

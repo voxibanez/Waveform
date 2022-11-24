@@ -20,6 +20,8 @@ public class WaveformGenerator: ObservableObject {
         didSet { refreshData() }
     }
     
+    @State private var initialized = false
+    
     /// Creates an instance from an `AVAudioFile`.
     /// - Parameter audioFile: The audio file to generate waveform data from.
     public init?(audioFile: AVAudioFile) {

@@ -7,7 +7,7 @@ struct Highlight: Shape {
     
     func path(in rect: CGRect) -> Path {
         Path { path in
-            guard selectedSamples.count > 0, selectedSamples.overlaps(generator.renderSamples) else { return }
+            guard selectedSamples.count > 0, selectedSamples.overlaps(generator.renderSamples), generator.sampleData.count > 0 else { return }
             
             let startPosition = max(0, generator.position(of: selectedSamples.lowerBound))
             let endPosition = min(generator.position(of: selectedSamples.upperBound), generator.width)
